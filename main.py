@@ -3,20 +3,20 @@
 #count = 20
 import psycopg2
 from psycopg2 import sql
+from datetime import date
 
 # Function to connect to PostgreSQL
-#cofigure the following connection according to your satisfaction
-
 def connect():
     conn = psycopg2.connect(
-        dbname="your_database_name",
-        user="your_username",
-        password="your_password",
-        host="localhost"
+        host="localhost",
+        database="home",
+        port="5000",
+        user="postgres",
+        password="admin"
     )
     return conn
 
-# Function to check if tables exist
+
 def tables_exist(conn):
     cur = conn.cursor()
     cur.execute("""
@@ -30,16 +30,16 @@ def tables_exist(conn):
     cur.close()
     return exists
 
-# Function to create tables
+
 def create_tables(conn):
     commands = (
         """
         CREATE TABLE IF NOT EXISTS Property (
             Property_ID SERIAL PRIMARY KEY,
-            Property_Name VARCHAR(255),
-            Address VARCHAR(255),
-            City VARCHAR(100),
-            State VARCHAR(100),
+            Property_Name VARCHAR(20),
+            Address VARCHAR(20),
+            City VARCHAR(10),
+            State VARCHAR(10),
             Zip_Code VARCHAR(20),
             Type VARCHAR(50),
             Size INTEGER,
@@ -50,26 +50,26 @@ def create_tables(conn):
         """
         CREATE TABLE IF NOT EXISTS Landlord (
             Landlord_ID SERIAL PRIMARY KEY,
-            First_Name VARCHAR(100),
-            Last_Name VARCHAR(100),
-            Email VARCHAR(255),
+            First_Name VARCHAR(10),
+            Last_Name VARCHAR(10),
+            Email VARCHAR(20),
             Phone VARCHAR(20),
-            Address VARCHAR(255),
+            Address VARCHAR(20),
             City VARCHAR(100),
-            State VARCHAR(100),
+            State VARCHAR(10),
             Zip_Code VARCHAR(20)
         )
         """,
         """
         CREATE TABLE IF NOT EXISTS Tenants (
             Tenant_ID SERIAL PRIMARY KEY,
-            First_Name VARCHAR(100),
-            Last_Name VARCHAR(100),
-            Email VARCHAR(255),
+            First_Name VARCHAR(10),
+            Last_Name VARCHAR(10),
+            Email VARCHAR(20),
             Phone VARCHAR(20),
-            Address VARCHAR(255),
-            City VARCHAR(100),
-            State VARCHAR(100),
+            Address VARCHAR(20),
+            City VARCHAR(10),
+            State VARCHAR(10),
             Zip_Code VARCHAR(20),
             Start_Date DATE,
             End_Date DATE,
@@ -92,14 +92,13 @@ def create_tables(conn):
             Amount NUMERIC(10, 2),
             Date DATE,
             Payment_Method VARCHAR(50),
-            Tenant_ID INTEGER REFERENCES Tenants(Tenant_ID),
-            Booking_ID INTEGER REFERENCES Booking(Booking_ID)
+            Tenant_ID INTEGER REFERENCES Tenants(Tenant_ID)
         )
         """,
         """
         CREATE TABLE IF NOT EXISTS Amenities (
             Amenity_ID SERIAL PRIMARY KEY,
-            Amenity_Name VARCHAR(100),
+            Amenity_Name VARCHAR(10),
             Description TEXT
         )
         """,
@@ -140,6 +139,51 @@ def create_tables(conn):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+# Function to insert data into Property table
+def insert_property_data(conn):
+    try:
+        cur = conn.cursor()
+        # Insert data with parameterized query
+        property_data = [
+            ("Property1", "123 Main St", "Nairobi", "Nairobi", "0010", "Apartment", 1000, 1500.00, "Available"),
+            ("Property2", "456 Central Ave", "Mombasa", "Mombasa", "00200", "House", 1500, 2000.00, "Occupied"),
+            ("Property3", "789 Park Rd", "Kisumu", "Kisumu", "00300", "Condo", 1200, 1800.00, "Available"),
+            ("Property4", "101 River St", "Nakuru", "Nakuru", "00400", "Duplex", 1300, 2200.00, "Available"),
+            ("Property5", "111 Garden Blvd", "Eldoret", "Uasin Gishu", "00500", "Townhouse", 1100, 1600.00, "Occupied"),
+            ("Property6", "222 Lakeview Dr", "Thika", "Kiambu", "00600", "Villa", 1700, 2500.00, "Available"),
+            ("Property7", "333 Mountain Rd", "Kakamega", "Kakamega", "00700", "Penthouse", 1400, 2300.00, "Available"),
+            ("Property8", "444 Beach Ave", "Malindi", "Kilifi", "00800", "Cottage", 1600, 2000.00, "Occupied")
+        ]
+        for data in property_data:
+            cur.execute("""
+                INSERT INTO Property (Property_Name, Address, City, State, Zip_Code, Type, Size, Rental_Rate, Status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """, data)
+        conn.commit()
+        print("Property data inserted successfully")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+# Function to fetch one record from Property table
+def fetch_one_property(conn):
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Property LIMIT 1;")
+        record = cur.fetchone()
+        print("Fetched one record from Property table:", record)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+# Function to fetch all records from Property table
+def fetch_all_property(conn):
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Property;")
+        records = cur.fetchall()
+        print("Fetched all records from Property table:", records)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
 # Main function
 if __name__ == '__main__':
     # Connect to PostgreSQL
@@ -148,7 +192,13 @@ if __name__ == '__main__':
     if not tables_exist(conn):
         # Create tables if they don't exist
         create_tables(conn)
+        # Insert data into Property table
+        insert_property_data(conn)
     else:
         print("Tables already exist")
+    # Test fetching one record
+    fetch_one_property(conn)
+    # Test fetching all records
+    fetch_all_property(conn)
     # Close connection
     conn.close()

@@ -277,4 +277,25 @@ if __name__ == '__main__':
             conn.close()
             print('Database connection terminated.')
             
-            
+'''
+Database connection
+The connection function is used to connect the application backend together with the database. Which is postgres. Details In a connection function.
+
+
+Table creations
+Create_tables is a function used to create many tables in a database together to avoid delays and create other tables if they do not exist.
+Do not duplicate creation of tables we used a do note create if exitst function.
+Data insertion
+Used to insert data to created table quickly: 
+
+Error handling:
+Error handling is implemented using try-except blocks to catch any exceptions that may occur during database operations. Exceptions are printed for debugging purposes.
+Parametrised quieres:
+Parameterized queries are utilized throughout the code to prevent SQL injection attacks and improve query performance. They are employed in INSERT, DELETE, UPDATE, and SELECT statements
+Bulk update, Bulk delete, Fechone, fetchall and fechmany() API python calls:
+The `fetch_all_property()` function fetches all records from the `Property` table using the `fetchall()` method. It retrieves all rows from the result set and prints them.
+The `inner_join_example()` function performs an INNER JOIN between the `Property` and `Landlord` tables, demonstrating the usage of the `fetchall()` method to retrieve and print the result set.
+The `cross_join_example()` function executes a CROSS JOIN between the `Property` and `Landlord` tables and utilizes the `fetchall()` method to fetch and display the result set.
+
+
+'''

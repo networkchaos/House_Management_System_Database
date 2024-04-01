@@ -1,6 +1,10 @@
-#people have tried understanding the code but they cant and count if you are one of them
-#only me and God undestand
+
+#people have tried understanding the code but they cant add count if you are one of them
+#only me and God undestand 🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿🗿
 #count = 20
+
+
+#class collab 
 import psycopg2
 from psycopg2 import sql
 from datetime import date

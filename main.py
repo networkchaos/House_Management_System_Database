@@ -19,7 +19,8 @@ def connect():
         password="admin"
     )
     return conn
-
+#Database connection
+#The connection function is used to connect the application backend together with the database. Which is postgres. Details In a connection function.
 
 def tables_exist(conn):
     cur = conn.cursor()
@@ -34,7 +35,11 @@ def tables_exist(conn):
     cur.close()
     return exists
 
-
+'''
+Table creations
+Create_tables is a function used to create many tables in a database together to avoid delays and create other tables if they do not exist.
+Do not duplicate creation of tables we used a do note create if exitst function.
+'''
 def create_tables(conn):
     commands = (
         """
@@ -182,7 +187,13 @@ def bulk_delete_property(conn, property_ids):
         print("Bulk delete operation completed successfully")
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-
+'''
+Bulk update, Bulk delete, Fechone, fetchall and fechmany() API python calls:
+The `fetch_all_property()` function fetches all records from the `Property` table using the `fetchall()` method. It retrieves all rows from the result set and prints them.
+The `inner_join_example()` function performs an INNER JOIN between the `Property` and `Landlord` tables, demonstrating the usage of the `fetchall()` method to retrieve and print the result set.
+The `cross_join_example()` function executes a CROSS JOIN between the `Property` and `Landlord` tables and utilizes the `fetchall()` method to fetch and display the result set.
+ 
+'''
 # Function to perform INNER JOIN example
 def inner_join_example(conn):
     try:

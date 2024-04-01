@@ -15,7 +15,7 @@ def connect():
         host="localhost",
         database="home",
         port="5000",
-        user="postgre10
+        user="postgres",
         password="admin"
     )
     return conn

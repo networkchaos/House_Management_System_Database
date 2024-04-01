@@ -15,7 +15,7 @@ def connect():
         host="localhost",
         database="home",
         port="5000",
-        user="postgres",
+        user="postgre10
         password="admin"
     )
     return conn
@@ -168,13 +168,67 @@ def insert_property_data(conn):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-# Function to fetch one record from Property table
-def fetch_one_property(conn):
+# Function to bulk delete records from Property table
+def bulk_delete_property(conn, property_ids):
     try:
         cur = conn.cursor()
-        cur.execute("SELECT * FROM Property LIMIT 1;")
-        record = cur.fetchone()
-        print("Fetched one record from Property table:", record)
+        # Bulk Delete
+        bulk_delete_query = """
+        DELETE FROM Property 
+        WHERE Property_ID IN %s;
+        """
+        cur.execute(bulk_delete_query, (tuple(property_ids),))
+        conn.commit()
+        print("Bulk delete operation completed successfully")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+# Function to perform INNER JOIN example
+def inner_join_example(conn):
+    try:
+        cur = conn.cursor()
+        inner_join_query = """
+        SELECT Property.Property_Name, Property.Address, Landlord.First_Name, Landlord.Last_Name
+        FROM Property
+        INNER JOIN Landlord ON Property.Property_ID = Landlord.Property_ID;
+        """
+        cur.execute(inner_join_query)
+        inner_join_result = cur.fetchall()
+        print("\nINNER JOIN Result:")
+        for row in inner_join_result:
+            print(row)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+# Function to perform CROSS JOIN example
+def cross_join_example(conn):
+    try:
+        cur = conn.cursor()
+        cross_join_query = """
+        SELECT Property.Property_Name, Landlord.First_Name
+        FROM Property
+        CROSS JOIN Landlord;
+        """
+        cur.execute(cross_join_query)
+        cross_join_result = cur.fetchall()
+        print("\nCROSS JOIN Result:")
+        for row in cross_join_result:
+            print(row)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+# Function to perform UPDATE operation
+def update_property_status(conn, property_id, new_status):
+    try:
+        cur = conn.cursor()
+        update_query = """
+        UPDATE Property
+        SET Status = %s
+        WHERE Property_ID = %s;
+        """
+        cur.execute(update_query, (new_status, property_id))
+        conn.commit()
+        print("Property status updated successfully")
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
@@ -192,17 +246,35 @@ def fetch_all_property(conn):
 if __name__ == '__main__':
     # Connect to PostgreSQL
     conn = connect()
-    # Check if tables exist
-    if not tables_exist(conn):
+    try:
         # Create tables if they don't exist
         create_tables(conn)
         # Insert data into Property table
         insert_property_data(conn)
-    else:
-        print("Tables already exist")
-    # Test fetching one record
-    fetch_one_property(conn)
-    # Test fetching all records
-    fetch_all_property(conn)
-    # Close connection
-    conn.close()
+        # Test fetching all records
+        fetch_all_property(conn)
+        # Test bulk delete
+        bulk_delete_property(conn, [1, 3, 5])
+        # Test fetching all records after bulk delete
+        fetch_all_property(conn)
+        # Test INNER JOIN
+        inner_join_example(conn)
+        # Test CROSS JOIN
+        cross_join_example(conn)
+        # Test UPDATE
+        update_property_status(conn, 2, "Unavailable")
+        # Fetch all records after update
+        fetch_all_property(conn)
+        # Print PostgreSQL database version
+        cur = conn.cursor()
+        cur.execute('SELECT version()')
+        db_version = cur.fetchone()
+        print('PostgreSQL database version:', db_version)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection terminated.')
+            
+            
